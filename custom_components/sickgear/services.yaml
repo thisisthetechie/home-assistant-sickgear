@@ -1,0 +1,20 @@
+pause:
+  name: Disable
+  description: Disables Backlog.
+  fields:
+    api_key:
+      name: SickGear API key
+      description: The SickGear API key to disable backlog
+      required: true
+      selector:
+        text:
+resume:
+  name: Enable
+  description: Enables Backlog.
+  fields:
+    api_key:
+      name: SickGear API key
+      description: The SickGear API key to enable backlog
+      required: true
+      selector:
+        text:

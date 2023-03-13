@@ -23,12 +23,11 @@ from .const import DOMAIN, DEFAULT_NAME
 
 USER_SCHEMA = vol.Schema(
     {
+        vol.Required(CONF_URL): str,
         vol.Required(CONF_API_KEY): str,
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
-        vol.Required(CONF_URL): str,
     }
 )
-
 
 class SickGearConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for SickGear Integration."""

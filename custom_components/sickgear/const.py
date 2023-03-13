@@ -8,12 +8,10 @@ LOGGER: Logger = getLogger(__package__)
 NAME = "SickGear"
 DOMAIN = "sickgear"
 VERSION = "0.0.0"
-ATTRIBUTION = (
-    """
+ATTRIBUTION = """
     Based on the Integration Blueprint for HACS : https://github.com/ludeeus/sickgear
     Also uses a modified version of the SABNZBd Integration : https://www.home-assistant.io/integrations/sabnzbd
     """
-)
 
 DEFAULT_HOST = "localhost"
 DEFAULT_NAME = "SickGear"
@@ -61,3 +59,10 @@ SHOWS_LATER = "shows_later"
 SHOWS_TODAY = "shows_today"
 SHOWS_SOON = "shows_soon"
 SHOWS_MISSED = "shows_missed"
+DISK_LOCATION = "location"
+DISK_PRIMARY = "default"
+DISK_VALID = "valid"
+DISK_SPACE = "free_space"
+
+BACKLOG_PAUSE = "backlog_disable"
+BACKLOG_RESUME = "backlog_enable"
