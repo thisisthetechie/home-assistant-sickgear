@@ -73,6 +73,13 @@ class Show(TypedDict, total=True):
     start_date: date | None
 
 
+class RootDrive(TypedDict, total=True):
+    """Dict of Root Disk details."""
+
+    is_valid: bool | None
+    free_space: str | None
+
+
 class SickGearSensorEntity(SensorEntity):
     """Base class for sensor entities."""
 
@@ -83,4 +90,22 @@ class SickGearSensorEntity(SensorEntity):
     def __init__(self, sensor: SensorEntity) -> None:
         """Initialize."""
         super().__init__(sensor)
-        LOGGER.warning("Sensor Entity: %s", self._attr_show)
+
+
+class SickException(Exception):
+    """SickGear Exceptions."""
+
+    def __init__(self, message, mode=None) -> None:
+        """Initiate Exception."""
+        self.message = message
+        self.mode = mode
+
+    def __str__(self):
+        """Set Exception Value."""
+        if self.mode is not None:
+            msg_format = "{}: calling api endpoint '{}'"
+        else:
+            msg_format = "{}"
+        return msg_format.format(
+            self.message, self.mode if self.mode is not None else ""
+        )

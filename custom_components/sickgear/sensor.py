@@ -10,7 +10,12 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DOMAIN, SIGNAL_SICKGEAR_UPDATED
 from .const import DEFAULT_NAME, KEY_API_DATA, KEY_NAME
-from .sickgear import SickGearEntityDescription, SickGearSensorEntity, Episode
+from .sickgear import (
+    SickGearEntityDescription,
+    SickGearSensorEntity,
+    Episode,
+    RootDrive,
+)
 
 from .const import (
     # LOGGER,
@@ -35,6 +40,10 @@ from .const import (
     SHOWS_TODAY,
     SHOWS_SOON,
     SHOWS_MISSED,
+    DISK_LOCATION,
+    DISK_PRIMARY,
+    DISK_SPACE,
+    DISK_VALID,
 )
 
 
@@ -105,6 +114,18 @@ SENSORS = (
         icon="mdi:television-guide",
         category="upcoming",
     ),
+    SickGearEntityDescription(
+        key="primary_disk",
+        name="Default Disk",
+        icon="mdi:harddisk",
+        category="disks",
+    ),
+    SickGearEntityDescription(
+        key="secondary_disk",
+        name="Other Disks",
+        icon="mdi:harddisk-plus",
+        category="disks",
+    ),
 )
 
 
@@ -142,7 +163,6 @@ class SickGearSensor(SickGearSensorEntity):
         entry_id,
     ) -> None:
         """Initialize the sensor."""
-
         self._attr_unique_id = f"{entry_id}_{description.key}"
         self.entity_description = description
         self._sickgear_api = sick_api_data
@@ -199,6 +219,36 @@ class SickGearSensor(SickGearSensorEntity):
                 self._attr_native_value = self._sickgear_api.get_show_stat(
                     self.entity_description.key
                 )
+
+            case "disks":
+                disks = self._sickgear_api.get_root_drives()
+                disk_count = 0
+                disk_info = []
+
+                for disk in disks:
+                    if disk[DISK_VALID] == 1:
+                        if disk[DISK_PRIMARY] == 1:
+                            default_disk_location = disk[DISK_LOCATION]
+                            default_disk_info = [
+                                RootDrive(
+                                    free_space=disk[DISK_SPACE],
+                                ),
+                            ]
+                        else:
+                            disk_count += 1
+                            disk_info += [
+                                RootDrive(
+                                    location=disk[DISK_LOCATION],
+                                    free_space=disk[DISK_SPACE],
+                                ),
+                            ]
+
+                if self.entity_description.key == "primary_disk":
+                    self._attr_native_value = default_disk_location
+                    self._attr_extra_state_attributes[ATTRIBUTE_KEY] = default_disk_info
+                else:
+                    self._attr_native_value = disk_count
+                    self._attr_extra_state_attributes[ATTRIBUTE_KEY] = disk_info
 
         if self._attr_native_value is None:
             if self.entity_description.key == MISSING_EPISODES:

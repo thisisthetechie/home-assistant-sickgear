@@ -6,7 +6,7 @@ from collections.abc import Callable
 from .sickapi import SickApiException
 import voluptuous as vol
 
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigEntryState
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_HOST,
@@ -38,13 +38,20 @@ from .const import (
     KEY_NAME,
     SIGNAL_SICKGEAR_UPDATED,
     UPDATE_INTERVAL,
+    BACKLOG_PAUSE,
+    BACKLOG_RESUME,
 )
 from .sickgear import get_client
 
 PLATFORMS = [
     Platform.SENSOR,
-    Platform.BINARY_SENSOR,
+    Platform.SWITCH,
 ]
+
+SERVICES = (
+    BACKLOG_PAUSE,
+    BACKLOG_RESUME,
+)
 
 SERVICE_BASE_SCHEMA = vol.Schema(
     {
@@ -189,12 +196,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return wrapper
 
     @extract_api
-    async def async_pause_queue(call: ServiceCall, api: SickGearApiData) -> None:
-        await api.async_pause_queue()
+    async def async_backlog_disable(call: ServiceCall, api: SickGearApiData) -> None:
+        await api.async_backlog_off()
 
     @extract_api
-    async def async_resume_queue(call: ServiceCall, api: SickGearApiData) -> None:
-        await api.async_resume_queue()
+    async def async_backlog_enable(call: ServiceCall, api: SickGearApiData) -> None:
+        await api.async_backlog_on()
+
+    for service, method, schema in (
+        (BACKLOG_PAUSE, async_backlog_disable, SERVICE_BASE_SCHEMA),
+        (BACKLOG_RESUME, async_backlog_enable, SERVICE_BASE_SCHEMA),
+    ):
+        if hass.services.has_service(DOMAIN, service):
+            continue
+
+        hass.services.async_register(DOMAIN, service, method, schema=schema)
 
     async def async_update_sickgear(now):
         """Refresh SickGear queue data."""
@@ -217,6 +233,17 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
 
+    loaded_entries = [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.state == ConfigEntryState.LOADED
+    ]
+    if len(loaded_entries) == 1:
+        # If this is the last loaded instance of Sabnzbd, deregister any services
+        # defined during integration setup:
+        for service_name in SERVICES:
+            hass.services.async_remove(DOMAIN, service_name)
+
     return unload_ok
 
 
@@ -227,20 +254,20 @@ class SickGearApiData:
         """Initialize component."""
         self.sick_api = sick_api
 
-    async def async_pause_queue(self):
-        """Pause SickGear queue."""
+    async def async_backlog_disable(self):
+        """Turn a Backlog off."""
 
         try:
-            return await self.sick_api.pause_queue()
+            return await self.sick_api.backlog_disable()
         except SickApiException as err:
             LOGGER.error(err)
             return False
 
-    async def async_resume_queue(self):
-        """Resume SickGear queue."""
+    async def async_backlog_enable(self):
+        """Turn a Backlog on."""
 
         try:
-            return await self.sick_api.resume_queue()
+            return await self.sick_api.backlog_enable()
         except SickApiException as err:
             LOGGER.error(err)
             return False
@@ -256,3 +283,7 @@ class SickGearApiData:
     def get_upcoming_shows(self, key):
         """Return the value for the given field from the SickGear queue."""
         return self.sick_api.shows_upcoming.get(key)
+
+    def get_root_drives(self):
+        """Return the value for the given field from the SickGear queue."""
+        return self.sick_api.root_drives
