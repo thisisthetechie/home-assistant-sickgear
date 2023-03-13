@@ -1,0 +1,21 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Please provide the URL and API Token to access your SickGear Instance",
+                "data": {
+                    "api_key": "API Key",
+                    "name": "Name",
+                    "url": "URL"
+                }
+            }
+        },
+        "error": {
+            "auth": "Username/Password is wrong.",
+            "connection": "Unable to connect to the server.",
+            "unknown": "Unknown error occurred.",
+            "cannot_connect": "Failed to connect",
+            "invalid_api_key": "Invalid API key"
+        }
+    }
+}
