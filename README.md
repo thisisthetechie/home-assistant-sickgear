@@ -15,7 +15,7 @@ _Home Assistant Integration to communicate with [sickgear][sickgear]._
 
 Platform | Description
 -- | --
-`binary_sensor` | Show something `True` or `False`.
+`switch` | Turn something `on` or `off`.
 `sensor` | Show info from blueprint API.
 
 ## Installation
