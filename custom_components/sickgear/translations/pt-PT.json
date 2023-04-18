@@ -1,0 +1,21 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Inserir os link e o API token para aceder ao SickGear",
+                "data": {
+                    "api_key": "Chave de API",
+                    "name": "Nome",
+                    "url": "URL"
+                }
+            }
+        },
+        "error": {
+            "auth": "Nome de Utilizador/Password Errada.",
+            "connection": "Não é possivel ligar ao servidor.",
+            "unknown": "Erro desconhecido.",
+            "cannot_connect": "FAlha na ligação",
+            "invalid_api_key": "Chave de API invalida"
+        }
+    }
+}
