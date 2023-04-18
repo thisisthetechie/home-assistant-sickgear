@@ -1,4 +1,6 @@
 # Home Assistant - SickGear Integration
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thisisthetechie&repository=home-assistant-sickgear&category=integration)
+
 <div><a id="top"><img alt="Home Assistant" height="100" src="https://www.home-assistant.io/images/favicon-192x192-full.png" /><img alt="SickGear" width="200" src="https://raw.githubusercontent.com/wiki/SickGear/SickGear.Wiki/images/SickGearLogo.png"></a></div>
 
 [![GitHub Release][releases-shield]][releases]
