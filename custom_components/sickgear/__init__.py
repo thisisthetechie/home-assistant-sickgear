@@ -233,12 +233,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
 
-    loaded_entries = [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.state == ConfigEntryState.LOADED
+    other_loaded_entries = [
+        _entry
+        for _entry in hass.config_entries.async_loaded_entries(DOMAIN)
+        if _entry.entry_id != entry.entry_id
     ]
-    if len(loaded_entries) == 1:
+    if not other_loaded_entries:
         # If this is the last loaded instance of Sabnzbd, deregister any services
         # defined during integration setup:
         for service_name in SERVICES:
